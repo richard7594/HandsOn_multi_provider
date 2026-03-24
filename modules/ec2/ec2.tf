@@ -1,3 +1,4 @@
+# change  ami  to almaLinux 9
 data "aws_ami" "ami" {
 
   most_recent = true
@@ -24,7 +25,7 @@ resource "aws_launch_template" "template" {
   image_id               = data.aws_ami.ami.id
   instance_type          = var.instance_type
   vpc_security_group_ids = [var.instance_sg_id]
-  user_data              = filebase64("${path.root}/user_data.sh")
+  user_data              = filebase64("${path.module}/user_data.sh")
 }
 
 resource "aws_instance" "ec2" {

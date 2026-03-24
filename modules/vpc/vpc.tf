@@ -19,8 +19,22 @@ resource "aws_subnet" "private" {
 }
 
 
+#two subnet RDS 
+# need to create et associate route table 
+resource "aws_subnet" "rds_private" {
+  for_each          = var.az
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.pri_sub_cidr[each.key]
+  availability_zone = each.value
+  tags = {
+    Name = "private rds subnet"
+  }
+}
 
-resource "aws_subnet" "public" {
+
+
+# need to be duplicate according to architecture graph
+resource "aws_subnet" "public" { 
   vpc_id     = aws_vpc.vpc.id
   cidr_block = var.pub_sub_cidr
 
@@ -28,6 +42,10 @@ resource "aws_subnet" "public" {
     Name = "public subnet"
   }
 }
+
+
+
+
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
