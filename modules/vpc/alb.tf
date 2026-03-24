@@ -4,7 +4,7 @@ resource "aws_lb" "alb" {
   internal                         = false
   load_balancer_type               = "application"
   security_groups                  = [aws_security_group.alb_sg.id]
-  subnets                          = [aws_subnet.public.id]
+  subnets                          = [aws_subnet.private["az1"].id, aws_subnet.private["az2"].id]
   enable_cross_zone_load_balancing = true
 
   tags = {
@@ -38,8 +38,16 @@ resource "aws_lb_listener_rule" "rule" {
     target_group_arn = aws_lb_target_group.tg.arn
   }
 
-  condition {
-    #Hum
+  condition { #I don't know the behaviour of this block , to be assess
+    source_ip {
+      values = ["0.0.0.0/0"]
+    }
   }
 
+}
+
+
+resource "aws_lb_target_group_attachment" "tg" {
+  target_group_arn = aws_lb_target_group.tg.arn
+  target_id        = var.instance_id
 }

@@ -6,10 +6,10 @@ variable "vpc_cidr" {
   type = string
 }
 
-variable "pub_sub_cidr" {
-  type = string
+variable "pri_sub_cidr" {
+  type = map(string)
 }
 
-variable "pri_sub_cidr" {
+variable "pub_sub_cidr" {
   type = string
 }

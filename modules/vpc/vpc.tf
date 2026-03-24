@@ -7,20 +7,25 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-resource "aws_subnet" "public" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.pub_sub_cidr
+# two private subnet in separate AZ
+resource "aws_subnet" "private" {
+  for_each          = var.az
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.pri_sub_cidr[each.key]
+  availability_zone = each.value
   tags = {
-    Name = "public subnet"
+    Name = "private subnet"
   }
 }
 
-resource "aws_subnet" "private" {
+
+
+resource "aws_subnet" "public" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.pri_sub_cidr
+  cidr_block = var.pub_sub_cidr
 
   tags = {
-    Name = "private subnet"
+    Name = "public subnet"
   }
 }
 
@@ -28,10 +33,16 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 }
 
+resource "aws_eip" "ip" {
+}
+
+
 #to be complete maybe
 resource "aws_nat_gateway" "ngw" {
-  subnet_id = aws_subnet.public.id
+  subnet_id     = aws_subnet.public.id
+  allocation_id = aws_eip.ip.id
 }
+
 
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.vpc.id
@@ -63,7 +74,8 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.public.id
+  for_each       = var.az
+  subnet_id      = aws_subnet.private[each.key].id
   route_table_id = aws_route_table.private.id
 }
 
@@ -71,9 +83,7 @@ resource "aws_route_table_association" "private" {
 resource "aws_security_group" "alb_sg" {
 
   vpc_id = aws_vpc.vpc.id
-
   ingress {
-
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -84,9 +94,12 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "instance_sg" {
 
   vpc_id = aws_vpc.vpc.id
-
   ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
+
   }
 
 }
