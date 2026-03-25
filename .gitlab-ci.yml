@@ -1,6 +1,8 @@
 default:
   interruptible: false
-  image: hashicorp/terraform:latest
+  image: 
+    name: hashicorp/terraform:latest
+    entrypoint: [""]
   
  
 stages:
@@ -12,19 +14,21 @@ stages:
 
 .standart_rule:
   rules:
-    -if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    -if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 
 fmt_job:
   stage: fmt
   script:
-    - terraform fmt -recursive  
+    - terraform fmt -recursive
   extends:
     - .standart_rule
 
 validate_job:
   stage: validate
+  before_script :
+    - terraform init
   script:
     - terraform validate  
   extends:
@@ -40,15 +44,17 @@ init_job:
 
 plan_job:
   stage: plan
+  before_script :
+    - terraform init
   script:
-    - terraform plan -out=myplan    # need to create artifact
+    - terraform plan -out=artifact/myplan    # need to create artifact
   artifacts:
     untracked: false
     when: on_success
     access: all
     expire_in: 10 days
     paths:
-      - plan/
+      - artifact/
   extends:
     - .standart_rule    
 
@@ -57,7 +63,9 @@ apply_job:
   stage: apply
   dependencies:
     - plan_job
+  before_script :
+    - terraform init  
   script:
-    - terraform apply myplan 
+    - terraform apply "artifact/myplan" 
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
