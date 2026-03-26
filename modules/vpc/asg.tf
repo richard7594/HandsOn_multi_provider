@@ -5,7 +5,7 @@ locals {
 
 resource "aws_autoscaling_group" "asg" {
 
-  vpc_zone_identifier = [aws_subnet.private["az1"].id,aws_subnet.private["az2"].id] #vpc identification
+  vpc_zone_identifier = [aws_subnet.private["az1"].id, aws_subnet.private["az2"].id] #vpc identification
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1

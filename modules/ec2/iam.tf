@@ -34,6 +34,13 @@ resource "aws_iam_role_policy" "s3" {
 }
 
 
+# allow ssm session manager on instance 
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.instance.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedEC2InstanceDefaultPolicy"
+
+}
+
 
 
 resource "aws_iam_instance_profile" "ec2" {

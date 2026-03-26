@@ -19,24 +19,31 @@ resource "aws_subnet" "private" {
 }
 
 
+
+
+##### create vpc endpoint/ gateway endpoint + route to endpoint 
+
+
 #two subnet RDS 
 # need to create et associate route table 
-resource "aws_subnet" "rds_private" {
-  for_each          = var.az
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.pri_sub_cidr[each.key]
-  availability_zone = each.value
-  tags = {
-    Name = "private rds subnet"
-  }
-}
+
+# resource "aws_subnet" "rds_private" {
+#   for_each          = var.az
+#   vpc_id            = aws_vpc.vpc.id
+#   cidr_block        = var.pri_sub_cidr[each.key]
+#   availability_zone = each.value
+#   tags = {
+#     Name = "private rds subnet"
+#   }
+# }
 
 
 
 # need to be duplicate according to architecture graph
-resource "aws_subnet" "public" { 
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.pub_sub_cidr
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.pub_sub_cidr
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "public subnet"
@@ -112,11 +119,22 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "instance_sg" {
 
   vpc_id = aws_vpc.vpc.id
+
   ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
+
+  }
+
+
+
+  egress { # always set this ortherwise the outbound traffic is down 
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
 
   }
 
