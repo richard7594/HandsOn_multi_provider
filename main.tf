@@ -16,7 +16,7 @@ module "ec2" {
   subnet_id      = module.vpc.pri_sub_id1 #instance in the private subnet
   vpc_id         = module.vpc.vpc_id
   pub_sub_id     = module.vpc.pub_sub_id
-  ami            = "ami-0428ac7f9776f14c3"
+  ami            = "ami-0428ac7f9776f14c3" # move to .tfvars
 }
 
 module "rds" {
@@ -26,3 +26,4 @@ module "rds" {
 module "kurbenetes" {
   source = "./modules/kubernetes"
 }
+
