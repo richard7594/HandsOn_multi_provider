@@ -27,15 +27,15 @@ resource "aws_subnet" "private" {
 #two subnet RDS 
 # need to create et associate route table 
 
-# resource "aws_subnet" "rds_private" {
-#   for_each          = var.az
-#   vpc_id            = aws_vpc.vpc.id
-#   cidr_block        = var.pri_sub_cidr[each.key]
-#   availability_zone = each.value
-#   tags = {
-#     Name = "private rds subnet"
-#   }
-# }
+resource "aws_subnet" "rds_private" {
+  for_each          = var.az
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.rds_sub_cidr[each.key]
+  availability_zone = each.value
+  tags = {
+    Name = "private rds subnet"
+  }
+}
 
 
 
@@ -137,12 +137,12 @@ resource "aws_security_group" "instance_sg" {
   }
 
 
-  ingress {
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
-  }
+  # ingress {
+  #   from_port       = 8080
+  #   to_port         = 8080
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.alb_sg.id]
+  # }
 
 
   # ingress {
@@ -159,6 +159,26 @@ resource "aws_security_group" "instance_sg" {
     protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
 
+  }
+
+}
+
+
+resource "aws_security_group" "rds_sg" {
+
+  ingress {
+
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.instance_sg.id]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = -1
+    security_groups = ["0.0.0.0/0"]
   }
 
 }

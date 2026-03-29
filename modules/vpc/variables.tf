@@ -22,6 +22,10 @@ variable "launch_template" {
   type = string
 }
 
+variable "rds_sub_cidr" {
+  type = map(string)
+
+}
 variable "instance_id" {
   type = string
 }

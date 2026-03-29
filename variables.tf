@@ -13,3 +13,7 @@ variable "pri_sub_cidr" {
 variable "pub_sub_cidr" {
   type = string
 }
+variable "rds_sub_cidr" {
+  type = map(string)
+
+}

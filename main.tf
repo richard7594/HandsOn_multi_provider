@@ -4,6 +4,7 @@ module "vpc" {
   vpc_cidr        = var.vpc_cidr
   pub_sub_cidr    = var.pub_sub_cidr
   pri_sub_cidr    = var.pri_sub_cidr
+  rds_sub_cidr    = var.rds_sub_cidr
   launch_template = module.ec2.launch_template
   instance_id     = module.ec2.instance_id
 }
@@ -20,7 +21,10 @@ module "ec2" {
 }
 
 module "rds" {
-  source = "./modules/rds"
+  source      = "./modules/rds"
+  rds_sub_id1 = module.vpc.rds_sub_id1
+  rds_sub_id2 = module.vpc.rds_sub_id2
+  rds_sg_id   = module.vpc.rds_sg_id
 }
 
 module "kurbenetes" {

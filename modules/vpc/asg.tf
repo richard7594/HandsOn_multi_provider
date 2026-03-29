@@ -1,7 +1,7 @@
 
-locals {
-  az = ["eu-west-1a", "eu-west-1b"]
-}
+# locals {
+#   az = ["eu-west-1a", "eu-west-1b"]
+# }
 
 resource "aws_autoscaling_group" "asg" {
 

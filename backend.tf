@@ -14,7 +14,7 @@ terraform {
 
     region       = "eu-west-1"
     bucket       = "handson-aws-group"
-    key          = "state1/terraform.tfstate" # the previous state was corrupt
+    key          = "state1/terraform.tfstate" # the previous state was corrupted
     use_lockfile = true
     encrypt      = true
 
