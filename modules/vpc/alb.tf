@@ -7,17 +7,29 @@ resource "aws_lb" "alb" {
   subnets                          = [aws_subnet.private["az1"].id, aws_subnet.private["az2"].id]
   enable_cross_zone_load_balancing = true
 
+  health_check_logs {
+    bucket  = "handson-aws-group"
+    enabled = true
+    prefix  = "health_check_logs"
+  }
+
   tags = {
     Name = "ABL"
   }
 }
 
 resource "aws_lb_target_group" "tg" {
-  name     = "ec2"
-  port     = "80"
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc.id
-  
+  name             = "ec2"
+  port             = "80" # 80
+  protocol         = "HTTP"
+  protocol_version = "HTTP1"
+  vpc_id           = aws_vpc.vpc.id
+
+  health_check {
+    path                = "/"
+    unhealthy_threshold = 6
+  }
+
 }
 
 resource "aws_lb_listener" "wordpress" {
