@@ -7,7 +7,7 @@ variable "pri_sub_cidr" {
 }
 
 variable "pub_sub_cidr" {
-  type = string
+  type = map(string)
 }
 
 variable "az" {

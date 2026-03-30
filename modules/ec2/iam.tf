@@ -29,6 +29,9 @@ data "aws_iam_policy_document" "secret" {
   }
 }
 
+
+
+
 resource "aws_iam_role" "instance" {
 
   name               = "instance"
@@ -52,6 +55,11 @@ resource "aws_iam_role_policy_attachment" "ssm" {
   role       = aws_iam_role.instance.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedEC2InstanceDefaultPolicy"
 
+}
+
+resource "aws_iam_role_policy_attachment" "rds" {
+  role       = aws_iam_role.instance.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
 

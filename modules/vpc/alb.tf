@@ -4,7 +4,7 @@ resource "aws_lb" "alb" {
   internal                         = false
   load_balancer_type               = "application"
   security_groups                  = [aws_security_group.alb_sg.id]
-  subnets                          = [aws_subnet.private["az1"].id, aws_subnet.private["az2"].id]
+  subnets                          = [aws_subnet.public["az1"].id, aws_subnet.public["az2"].id] # is where we deploy ALB, public subnet and internal = false for internet-facing with internet_gateway
   enable_cross_zone_load_balancing = true
 
   health_check_logs {
@@ -24,6 +24,7 @@ resource "aws_lb_target_group" "tg" {
   protocol         = "HTTP"
   protocol_version = "HTTP1"
   vpc_id           = aws_vpc.vpc.id
+  target_type      = "instance" # this one is responsible for fetch instance on  private subnet and any kind of subnet 
 
   health_check {
     path                = "/"

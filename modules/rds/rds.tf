@@ -14,7 +14,7 @@ resource "aws_db_subnet_group" "subnet" {
 # }
 
 resource "aws_db_instance" "db" {
-  instance_class              = "db.t2.micro"
+  instance_class              = "db.t3.micro"
   allocated_storage           = 5
   db_name                     = "wordpress"
   engine                      = "mysql"

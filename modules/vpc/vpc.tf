@@ -41,8 +41,10 @@ resource "aws_subnet" "rds_private" {
 
 # need to be duplicate according to architecture graph
 resource "aws_subnet" "public" {
+  for_each                = var.az
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.pub_sub_cidr
+  cidr_block              = var.pub_sub_cidr[each.key]
+  availability_zone       = each.value
   map_public_ip_on_launch = true
 
   tags = {
@@ -59,21 +61,25 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_eip" "ip" {
+  for_each = var.az
 }
 
 
 #to be complete maybe
 resource "aws_nat_gateway" "ngw" {
-  subnet_id     = aws_subnet.public.id
-  allocation_id = aws_eip.ip.id
+  for_each      = var.az
+  subnet_id     = aws_subnet.public[each.key].id
+  allocation_id = aws_eip.ip[each.key].id
 }
 
 
 resource "aws_route_table" "private" {
+  for_each = var.az
+
   vpc_id = aws_vpc.vpc.id
   route {
-    cidr_block     = "0.0.0.0/0"            # destination
-    nat_gateway_id = aws_nat_gateway.ngw.id #gateway
+    cidr_block     = "0.0.0.0/0"                      # destination
+    nat_gateway_id = aws_nat_gateway.ngw[each.key].id #gateway
   }
 
   tags = {
@@ -94,14 +100,15 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+  for_each       = var.az
+  subnet_id      = aws_subnet.public[each.key].id
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "private" {
   for_each       = var.az
   subnet_id      = aws_subnet.private[each.key].id
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[each.key].id
 }
 
 # Security group
@@ -166,6 +173,7 @@ resource "aws_security_group" "instance_sg" {
 
 resource "aws_security_group" "rds_sg" {
 
+  vpc_id = aws_vpc.vpc.id
   ingress {
 
     from_port       = 3306
@@ -175,10 +183,10 @@ resource "aws_security_group" "rds_sg" {
   }
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = -1
-    security_groups = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
