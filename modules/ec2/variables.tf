@@ -25,3 +25,8 @@ variable "pub_sub_id" {
 variable "ami" {
   type = string
 }
+
+variable "bucket_arn" {
+  type        = string
+  description = "buckect ARN for logs"
+}

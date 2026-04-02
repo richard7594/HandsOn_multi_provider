@@ -21,6 +21,7 @@ data "aws_iam_policy_document" "s3" {
   }
 }
 
+
 data "aws_iam_policy_document" "secret" {
   statement {
     effect    = "Allow"
@@ -29,6 +30,14 @@ data "aws_iam_policy_document" "secret" {
   }
 }
 
+data "aws_iam_policy_document" "s3" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = [var.bucket_arn]
+  }
+
+}
 
 
 

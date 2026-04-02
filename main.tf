@@ -1,3 +1,8 @@
+
+locals {
+  bucket_arn = "${aws_s3_bucket.s3.arn}/*"
+}
+
 module "vpc" {
   source = "./modules/vpc"
 
@@ -9,6 +14,7 @@ module "vpc" {
   instance_id     = module.ec2.instance_id
 }
 
+
 module "ec2" {
   source = "./modules/ec2"
 
@@ -18,6 +24,7 @@ module "ec2" {
   vpc_id         = module.vpc.vpc_id
   pub_sub_id     = module.vpc.pub_sub_id1  #Need for bastion debbug so you can remove, not useful now
   ami            = "ami-0428ac7f9776f14c3" # move to .tfvars
+  bucket_arn     = local.bucket_arn
 }
 
 module "rds" {
