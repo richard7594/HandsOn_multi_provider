@@ -71,6 +71,11 @@ resource "aws_iam_role_policy_attachment" "rds" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
+resource "aws_iam_role_policy" "name" {
+  role   = aws_iam_role.instance.name
+  policy = aws_iam_role_policy.s3.json
+
+}
 
 resource "aws_iam_instance_profile" "ec2" {
   role = aws_iam_role.instance.name
