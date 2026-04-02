@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "secret" {
   }
 }
 
-data "aws_iam_policy_document" "s3" {
+data "aws_iam_policy_document" "s3_permission" {
   statement {
     effect    = "Allow"
     actions   = ["s3:PutObject"]
@@ -71,9 +71,9 @@ resource "aws_iam_role_policy_attachment" "rds" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
-resource "aws_iam_role_policy" "name" {
+resource "aws_iam_role_policy" "s3_permission" {
   role   = aws_iam_role.instance.name
-  policy = aws_iam_role_policy.s3.json
+  policy = data.aws_iam_policy_document.s3_permission.json
 
 }
 
