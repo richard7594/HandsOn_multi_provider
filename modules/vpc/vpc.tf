@@ -190,3 +190,54 @@ resource "aws_security_group" "rds_sg" {
   }
 
 }
+
+
+#VPC_ENDPOINT
+
+locals {
+  region       = "eu-west-1"
+  service_name = "com.amazonaws.${local.region}.s3"
+}
+
+data "aws_iam_policy_document" "s3" { #if error , think about "principal" attribute
+  statement {
+    effect    = "Allow"
+    actions   = ["S3:PutObject"]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+  }
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = aws_vpc.vpc.id
+  service_name = local.service_name
+}
+
+
+resource "aws_route_table" "s3" {
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    vpc_endpoint_id            = aws_vpc_endpoint.s3.id
+    destination_prefix_list_id = aws_vpc_endpoint.s3.prefix_list_id # represente s3 traffic
+  }
+
+  tags = {
+    Name = "S3 route"
+  }
+}
+
+
+resource "aws_route_table_association" "s3" {
+  for_each       = var.az
+  route_table_id = aws_route_table.s3.id
+  subnet_id      = aws_subnet.private[each.key].id
+}
+
+resource "aws_vpc_endpoint_policy" "s3" {
+  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  policy          = data.aws_iam_policy_document.s3.json
+}
