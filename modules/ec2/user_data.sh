@@ -110,11 +110,13 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 ./aws/install
 
+/usr/local/bin/aws s3 cp /var/log/user-data.log s3://logshandsonrichanel/  #backup logs into s3
+
 #CLI cmd  aws secretsmanager get-secret-value --secret-id 'rds!db-314b9b7f-265d-4197-bbda-e374ba441163' 
 
 # Connect to db with CLI mysql -h terraform-20260330121002152100000001.cn2g8ss4kgjq.eu-west-1.rds.amazonaws.com -P 3306 -u wordpress -p
 
-
+#/usr/local/bin/aws
 
 
 
