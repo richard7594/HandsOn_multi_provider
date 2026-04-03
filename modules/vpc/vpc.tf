@@ -122,11 +122,11 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-   ingress {
-    from_port       = 6443
-    to_port         = 6443
-    protocol        = "tcp"
-    cidr_blocks = [ "0.0.0.0/0" ]
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -224,7 +224,7 @@ resource "aws_route_table" "s3" {
 
 
 resource "aws_vpc_endpoint_route_table_association" "s3" {
-  route_table_id = aws_route_table.s3.id
+  route_table_id  = aws_route_table.s3.id
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
 }
 

@@ -11,7 +11,7 @@
 
 # resource "aws_s3_bucket" "s3" {
 #   bucket = "logshandsonrichanel"
-  
+
 #   lifecycle {
 #     prevent_destroy = true
 #   }

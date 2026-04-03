@@ -26,6 +26,6 @@ variable "rds_sub_cidr" {
   type = map(string)
 
 }
-variable "instance_id" {
-  type = string
-}
+# variable "instance_id" {
+#   type = string
+# }

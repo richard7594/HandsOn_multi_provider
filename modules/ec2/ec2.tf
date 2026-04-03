@@ -59,14 +59,14 @@ resource "aws_launch_template" "template" {
   user_data              = filebase64("${path.module}/user_data.sh")
 }
 
-resource "aws_instance" "ec2" {
-  launch_template {
-    name    = aws_launch_template.template.name
-    version = "$Latest"
-  }
-  subnet_id                   = var.subnet_id
-  user_data_replace_on_change = true # where we can put this attribute on ASG
-}
+# resource "aws_instance" "ec2" {
+#   launch_template {
+#     name    = aws_launch_template.template.name
+#     version = "$Latest"
+#   }
+#   subnet_id                   = var.subnet_id
+#   #user_data_replace_on_change = true # where we can put this attribute on ASG
+# }
 
 
 

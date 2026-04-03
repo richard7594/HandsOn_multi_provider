@@ -16,6 +16,10 @@ resource "aws_lb" "alb" {
   tags = {
     Name = "ABL"
   }
+
+  lifecycle {
+    prevent_destroy = false
+  }  
 }
 
 resource "aws_lb_target_group" "tg" {
@@ -34,15 +38,16 @@ resource "aws_lb_target_group" "tg" {
 }
 
 resource "aws_lb_target_group" "kubernetes" {
-  name             = "kubernetes"
-  port             = "6443" # 80
-  protocol         = "TCP"
-  vpc_id           = aws_vpc.vpc.id
-  target_type      = "instance" # this one is responsible for fetch instance on  private subnet and any kind of subnet 
-  
+  name        = "kubernetes"
+  port        = "6443" # 80
+  protocol    = "HTTPS"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "instance" # this one is responsible for fetch instance on  private subnet and any kind of subnet 
+
   health_check {
     path                = "/"
     unhealthy_threshold = 6
+    matcher             = "200-499"
   }
 
 }
@@ -65,9 +70,10 @@ resource "aws_lb_listener" "wordpress" {
 
 
 resource "aws_lb_listener" "kurbenetes" {
-  load_balancer_arn = aws_lb.alb.arn 
+  load_balancer_arn = aws_lb.alb.arn
   port              = "6443"
-  protocol          = "TCP"
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.cert.arn
 
   default_action {
     type             = "forward"
@@ -104,7 +110,7 @@ resource "aws_lb_listener_rule" "rule_kubernetes" {
     target_group_arn = aws_lb_target_group.kubernetes.arn
   }
 
-  condition { 
+  condition {
     source_ip {
       values = ["0.0.0.0/0"]
     }
@@ -115,12 +121,12 @@ resource "aws_lb_listener_rule" "rule_kubernetes" {
 
 # add my own ec2 instance which don't belong ASG
 
-resource "aws_lb_target_group_attachment" "tg" {
-  target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = var.instance_id
-}
-resource "aws_lb_target_group_attachment" "kubernetes" {
-  target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = var.instance_id
-}
+# resource "aws_lb_target_group_attachment" "tg" {
+#   target_group_arn = aws_lb_target_group.tg.arn
+#   target_id        = var.instance_id
+# }
+# resource "aws_lb_target_group_attachment" "kubernetes" {
+#   target_group_arn = aws_lb_target_group.kubernetes.arn
+#   target_id        = var.instance_id
+# }
 

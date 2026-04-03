@@ -14,4 +14,4 @@ override.tf.json
 terraform.rc
 txt
 myplan
-
+test/
