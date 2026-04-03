@@ -122,6 +122,13 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+   ingress {
+    from_port       = 6443
+    to_port         = 6443
+    protocol        = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -144,21 +151,12 @@ resource "aws_security_group" "instance_sg" {
   }
 
 
-  # ingress {
-  #   from_port       = 8080
-  #   to_port         = 8080
-  #   protocol        = "tcp"
-  #   security_groups = [aws_security_group.alb_sg.id]
-  # }
-
-
-  # ingress {
-  #   from_port   = 8080
-  #   to_port     = 8080
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["10.0.0.0/16"]
-  # }
-
+  ingress {
+    from_port       = 6443
+    to_port         = 6443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
 
   egress { # always set this ortherwise the outbound traffic is down 
     from_port   = 0

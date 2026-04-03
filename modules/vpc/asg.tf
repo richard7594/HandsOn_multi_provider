@@ -19,3 +19,8 @@ resource "aws_autoscaling_attachment" "asg" {
   autoscaling_group_name = aws_autoscaling_group.asg.id
   lb_target_group_arn    = aws_lb_target_group.tg.arn
 }
+
+resource "aws_autoscaling_attachment" "asg_kubernetes" {
+  autoscaling_group_name = aws_autoscaling_group.asg.id
+  lb_target_group_arn    = aws_lb_target_group.kubernetes.arn
+}

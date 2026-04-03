@@ -11,6 +11,6 @@ provider "aws" {
 
 # to be complete
 provider "kubernetes" {
-  alias = "k3s"
+  
 
 }

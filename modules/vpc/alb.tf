@@ -33,6 +33,25 @@ resource "aws_lb_target_group" "tg" {
 
 }
 
+resource "aws_lb_target_group" "kubernetes" {
+  name             = "kubernetes"
+  port             = "6443" # 80
+  protocol         = "TCP"
+  vpc_id           = aws_vpc.vpc.id
+  target_type      = "instance" # this one is responsible for fetch instance on  private subnet and any kind of subnet 
+  
+  health_check {
+    path                = "/"
+    unhealthy_threshold = 6
+  }
+
+}
+
+
+
+
+
+
 resource "aws_lb_listener" "wordpress" {
   load_balancer_arn = aws_lb.alb.arn
   port              = "80"
@@ -43,6 +62,22 @@ resource "aws_lb_listener" "wordpress" {
     target_group_arn = aws_lb_target_group.tg.arn
   }
 }
+
+
+resource "aws_lb_listener" "kurbenetes" {
+  load_balancer_arn = aws_lb.alb.arn 
+  port              = "6443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.kubernetes.arn
+  }
+}
+
+
+
+
 
 resource "aws_lb_listener_rule" "rule" {
   listener_arn = aws_lb_listener.wordpress.arn
@@ -61,7 +96,31 @@ resource "aws_lb_listener_rule" "rule" {
 }
 
 
+resource "aws_lb_listener_rule" "rule_kubernetes" {
+  listener_arn = aws_lb_listener.wordpress.arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.kubernetes.arn
+  }
+
+  condition { 
+    source_ip {
+      values = ["0.0.0.0/0"]
+    }
+  }
+
+}
+
+
+# add my own ec2 instance which don't belong ASG
+
 resource "aws_lb_target_group_attachment" "tg" {
   target_group_arn = aws_lb_target_group.tg.arn
   target_id        = var.instance_id
 }
+resource "aws_lb_target_group_attachment" "kubernetes" {
+  target_group_arn = aws_lb_target_group.tg.arn
+  target_id        = var.instance_id
+}
+
