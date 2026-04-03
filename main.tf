@@ -34,7 +34,4 @@ module "rds" {
   rds_sg_id   = module.vpc.rds_sg_id
 }
 
-module "kurbenetes" {
-  source = "./modules/kubernetes"
-}
-
+# we don't call kubernetes module here because we are going to use in pipeline with CLI and flag -target 

@@ -1,5 +1,5 @@
 
-data "aws_iam_policy_document" "role" {
+data "aws_iam_policy_document" "role" { # trusted policy
 
   statement {
     actions = ["sts:AssumeRole"]
@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "role" {
   }
 }
 
-data "aws_iam_policy_document" "s3" {
+data "aws_iam_policy_document" "s3" { # permission policy
 
   statement {
 

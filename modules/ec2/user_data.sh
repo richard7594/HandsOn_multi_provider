@@ -1,9 +1,27 @@
-#! /bin/bash
+#! /bin/bash -xe
 
 #Note: put always -y when you install package via script bash
 
+
+# docs : https://repost.aws/knowledge-center/ec2-linux-rhel7-rhel8-log-user-data
+############## logs of bootstrap######################
+
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+cat /etc/redhat-release
+
+
+tee etc/default/grub << 'EOF'
+GRUB_CMDLINE_LINUX="console=tty1 console=ttyS0 net.ifnames=0 rd.blacklist=nouveau nvme_core.io_timeout=4294967295"
+GRUB_TIMEOUT=0
+GRUB_ENABLE_BLSCFG=true
+GRUB_DEFAULT=saved
+EOF
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+################################################### Note: can't be variable depend on what kind of linux distribution you are using 
+
 #installation ssm agent 
-dnf update
+dnf update -y
 dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 systemctl enable amazon-ssm-agent
 systemctl start amazon-ssm-agent

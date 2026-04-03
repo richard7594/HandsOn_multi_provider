@@ -219,22 +219,15 @@ resource "aws_vpc_endpoint" "s3" {
 
 resource "aws_route_table" "s3" {
   vpc_id = aws_vpc.vpc.id
-
-  route {
-    vpc_endpoint_id            = aws_vpc_endpoint.s3.id
-    destination_prefix_list_id = aws_vpc_endpoint.s3.prefix_list_id # represente s3 traffic
-  }
-
   tags = {
     Name = "S3 route"
   }
 }
 
 
-resource "aws_route_table_association" "s3" {
-  for_each       = var.az
+resource "aws_vpc_endpoint_route_table_association" "s3" {
   route_table_id = aws_route_table.s3.id
-  subnet_id      = aws_subnet.private[each.key].id
+  vpc_endpoint_id = aws_vpc_endpoint.s3.id
 }
 
 resource "aws_vpc_endpoint_policy" "s3" {
