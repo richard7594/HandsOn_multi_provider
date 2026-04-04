@@ -2,7 +2,7 @@ resource "kubernetes_deployment_v1" "pods" {
 
   metadata {
 
-    name   = "wordpres.deployment"
+    name   = "wordpres-deployment"
     labels = { app = "wordpress" }
 
   }
@@ -16,7 +16,7 @@ resource "kubernetes_deployment_v1" "pods" {
 
     template {
       metadata {
-        name   = "pods.wordpress"
+        name   = "pods-wordpress"
         labels = { app = "pods_wordpress" }
       }
 
@@ -40,7 +40,7 @@ resource "kubernetes_deployment_v1" "pods" {
 
 resource "kubernetes_service_v1" "service" {
   metadata {
-    name = "wordpress.service"
+    name = "wordpress-service"
   }
   spec {
     selector = {
@@ -49,11 +49,12 @@ resource "kubernetes_service_v1" "service" {
     }
 
     port {
-      node_port   = 8080
+      node_port   = 30300
       port        = 80
       target_port = 80
-    }
 
- 
+    }
+    type = "NodePort"
+
   }
 }

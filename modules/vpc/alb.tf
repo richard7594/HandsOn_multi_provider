@@ -19,8 +19,30 @@ resource "aws_lb" "alb" {
 
   lifecycle {
     prevent_destroy = false
-  }  
+  }
 }
+
+# NLB
+
+resource "aws_lb" "nlb" {
+  name                             = "ABL"
+  internal                         = false
+  load_balancer_type               = "network"
+  security_groups                  = [aws_security_group.nlb_sg.id]
+  subnets                          = [aws_subnet.public["az1"].id, aws_subnet.public["az2"].id] # is where we deploy ALB, public subnet and internal = false for internet-facing with internet_gateway
+  enable_cross_zone_load_balancing = true
+
+  health_check_logs {
+    bucket  = "handson-aws-group"
+    enabled = true
+    prefix  = "health_check_logs"
+  }
+
+   tags = {"type" = "NLB","Name"="NLB"} 
+
+}
+
+
 
 resource "aws_lb_target_group" "tg" {
   name             = "ec2"
@@ -37,10 +59,11 @@ resource "aws_lb_target_group" "tg" {
 
 }
 
+# NLB
 resource "aws_lb_target_group" "kubernetes" {
   name        = "kubernetes"
   port        = "6443" # 80
-  protocol    = "HTTPS"
+  protocol    = "TCP"
   vpc_id      = aws_vpc.vpc.id
   target_type = "instance" # this one is responsible for fetch instance on  private subnet and any kind of subnet 
 
@@ -51,9 +74,6 @@ resource "aws_lb_target_group" "kubernetes" {
   }
 
 }
-
-
-
 
 
 
@@ -68,12 +88,12 @@ resource "aws_lb_listener" "wordpress" {
   }
 }
 
-
+#NLB
 resource "aws_lb_listener" "kurbenetes" {
-  load_balancer_arn = aws_lb.alb.arn
+  load_balancer_arn = aws_lb.nlb.arn
   port              = "6443"
-  protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.cert.arn
+  protocol          = "TCP"
+  # certificate_arn   = aws_acm_certificate.cert.arn
 
   default_action {
     type             = "forward"
@@ -101,22 +121,8 @@ resource "aws_lb_listener_rule" "rule" {
 
 }
 
+#NLB
 
-resource "aws_lb_listener_rule" "rule_kubernetes" {
-  listener_arn = aws_lb_listener.wordpress.arn
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.kubernetes.arn
-  }
-
-  condition {
-    source_ip {
-      values = ["0.0.0.0/0"]
-    }
-  }
-
-}
 
 
 # add my own ec2 instance which don't belong ASG

@@ -11,7 +11,7 @@ module "vpc" {
   pri_sub_cidr    = var.pri_sub_cidr
   rds_sub_cidr    = var.rds_sub_cidr
   launch_template = module.ec2.launch_template
- # instance_id     = module.ec2.instance_id
+  # instance_id     = module.ec2.instance_id
 }
 
 
@@ -36,6 +36,6 @@ module "rds" {
 
 
 module "kurbenetes" {
-  source = "./modules/kubernetes"
-  depends_on = [ module.ec2,module.vpc,module.rds ]
+  source     = "./modules/kubernetes"
+  depends_on = [module.ec2, module.vpc, module.rds]
 } # we don't give value of module'variable from root module, this module is independent

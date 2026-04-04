@@ -122,6 +122,21 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
+}
+
+
+resource "aws_security_group" "nlb_sg" {
+
+  vpc_id = aws_vpc.vpc.id
+
   ingress {
     from_port   = 6443
     to_port     = 6443
@@ -137,6 +152,8 @@ resource "aws_security_group" "alb_sg" {
 
   }
 }
+
+
 
 # time out (request) ==> firewall ==> aws ==> security group ==> block egress
 resource "aws_security_group" "instance_sg" {
@@ -155,7 +172,7 @@ resource "aws_security_group" "instance_sg" {
     from_port       = 6443
     to_port         = 6443
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    security_groups = [aws_security_group.nlb_sg.id]
   }
 
   egress { # always set this ortherwise the outbound traffic is down 

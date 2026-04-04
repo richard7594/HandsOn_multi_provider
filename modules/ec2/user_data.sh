@@ -31,6 +31,9 @@ dnf install -y curl
 curl -sfL https://get.k3s.io | sh -  #ok
 #sudo swapoff -a
 #sudo sed -i '/swap/d' /etc/fstab   #think to open this port 6443, 10250 on security group
+ln -s /usr/local/bin/k3s /usr/bin/
+
+
 
 # docker runtime for kubernetes
 dnf -y install dnf-plugins-core
@@ -98,7 +101,7 @@ spec:
               number: 80
 EOF
 
-/usr/local/bin/k3s kubectl apply -f nginx.yaml
+k3s kubectl apply -f nginx.yaml
 
 
 
@@ -109,8 +112,9 @@ dnf install -y unzip
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
+ln -s /usr/local/bin/aws /usr/bin/
 
-/usr/local/bin/aws s3 cp /var/log/user-data.log s3://logshandsonrichanel/  #backup logs into s3
+aws s3 cp /var/log/user-data.log s3://logshandsonrichanel/  #backup logs into s3
 
 #CLI cmd  aws secretsmanager get-secret-value --secret-id 'rds!db-314b9b7f-265d-4197-bbda-e374ba441163' 
 
@@ -120,6 +124,9 @@ unzip awscliv2.zip
 
 
 
+
+
+# get cluster credentials 
 
 
 
