@@ -38,7 +38,7 @@ resource "aws_lb" "nlb" {
     prefix  = "health_check_logs"
   }
 
-   tags = {"type" = "NLB","Name"="NLB"} 
+  tags = { type = "NLB", Name = "NLB" }
 
 }
 

@@ -15,3 +15,4 @@ terraform.rc
 txt
 myplan
 test/
+credential.json

@@ -9,29 +9,26 @@ provider "aws" {
   }
 }
 
-
-data "aws_lb" "alb" {
-  region     = "eu-west-1"
-  tags = {"type" = "NLB"} 
-  depends_on = [module.vpc, module.ec2, module.rds]
+data "aws_secretsmanager_secret_version" "credentials" {
+  secret_id = "credentials"
 }
 
-
-locals {
-
-  ca = <<-EOF
-    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJkekNDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdGMyVnkKZG1WeUxXTmhRREUzTnpVeU9UTTROekF3SGhjTk1qWXdOREEwTURneE1URXdXaGNOTXpZd05EQXhNRGd4TVRFdwpXakFqTVNFd0h3WURWUVFEREJock0zTXRjMlZ5ZG1WeUxXTmhRREUzTnpVeU9UTTROekF3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFTRGs1R055ZVpnNnpLb3J4eVowMjY1WFkrNCt5UkdCVit4VkJsQk9KM3AKN1AwbkVCcFBTd01VcEYrdUk3SlBBYXRLQTdPaXovV29lSlNoV0hpVitTTnhvMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVU5Ed0VKdCtUK1d0Y05kQlVCRmxZCllJbS9pNHN3Q2dZSUtvWkl6ajBFQXdJRFNBQXdSUUloQUliQkRndStBTUFXbnVUdEJJMUJPN1dVM3hheWZDemQKSUI5Rk1LS1IySCtVQWlBZHNGU1F3RC9OTDlYWW44SjBObkRxNjkvUDMzNURqS29wTTBiTjZxWmZiUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-  EOF
+data "aws_lb" "nlb" {
+  region = "eu-west-1"
+  tags   = { Name = "NLB" }
+  # depends_on = [module.vpc, module.ec2, module.rds]
 }
+
 
 
 #/etc/rancher/k3s/k3s.yaml
-# to be complete
+
 provider "kubernetes" {
 
-  insecure = true # ==> curl -k 
-  host                   = "https://${data.aws_lb.alb.dns_name}:6443" #need to be pull directly from secret manager
-  client_certificate     = base64decode("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJrVENDQVRlZ0F3SUJBZ0lJWHZmaW9QZDA2dzB3Q2dZSUtvWkl6ajBFQXdJd0l6RWhNQjhHQTFVRUF3d1kKYXpOekxXTnNhV1Z1ZEMxallVQXhOemMxTWprek9EY3dNQjRYRFRJMk1EUXdOREE0TVRFeE1Gb1hEVEkzTURRdwpOREE0TVRFeE1Gb3dNREVYTUJVR0ExVUVDaE1PYzNsemRHVnRPbTFoYzNSbGNuTXhGVEFUQmdOVkJBTVRESE41CmMzUmxiVHBoWkcxcGJqQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJJd2VqRlVoVy9QZVkrd1oKaXRBMmZFK2JEMUNCdWM0S0dDMUlEYzQ2MEdIR0VQdHNzMjIrQ1dxd0VTOW9DQUxZNGFCMktQbEs3ck9PY1N2MwpuQStNZDF1alNEQkdNQTRHQTFVZER3RUIvd1FFQXdJRm9EQVRCZ05WSFNVRUREQUtCZ2dyQmdFRkJRY0RBakFmCkJnTlZIU01FR0RBV2dCUWR1ejhZWHFvTURTNlhwZ05ENHVTTE9kTk5tREFLQmdncWhrak9QUVFEQWdOSUFEQkYKQWlFQS81cGVaamE1anduMVo1cUxVUEtqMjczTnBQOXZqR1EyVENOSy9veEVCc29DSUF4ZDNpSGNGRFc4TUxzcgpqd0hvY0h1R3RnUHQvbUQzY3IxR3ZVVllBdDNpCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJkakNDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdFkyeHAKWlc1MExXTmhRREUzTnpVeU9UTTROekF3SGhjTk1qWXdOREEwTURneE1URXdXaGNOTXpZd05EQXhNRGd4TVRFdwpXakFqTVNFd0h3WURWUVFEREJock0zTXRZMnhwWlc1MExXTmhRREUzTnpVeU9UTTROekF3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFRanRvUlJZZmdoczR1YWhzajE3bURuM2Uvem9XbG5FaUgxVjFIL216WHAKL3lIMWFZWEM3c2JQVW5OSmRoNWhNMFAxTVg2ZFJOakhrdHNLVk4yNEVpb3JvMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVUhicy9HRjZxREEwdWw2WURRK0xrCml6blRUWmd3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnZFhScHlxeFNHcUZyNDAzblVOQVZXNWpqc3ptalpLeFUKN0tnSkxWZnJCVVVDSUNYNFVPcldIc05qYWkzWjBYbVpMVW0rQnBmbmJBYlVIcVZGZHBOcHFLQXcKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=")
-  client_key             = base64decode("LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUpSQlNsWHBFRmx6M1QzRm9RZ0xhaTdoNENGTnVUeUQ3TzMrV0x1dEh1b3ZvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFakI2TVZTRmI4OTVqN0JtSzBEWjhUNXNQVUlHNXpnb1lMVWdOempyUVljWVErMnl6YmI0SgphckFSTDJnSUF0amhvSFlvK1VydXM0NXhLL2VjRDR4M1d3PT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=")
-  # cluster_ca_certificate = base64decode(local.ca)
+  insecure               = true                                       # ==> curl -k 
+  host                   = "https://${data.aws_lb.nlb.dns_name}:6443" #need to be pull directly from secret manager
+  client_certificate     = base64decode(jsondecode(data.aws_secretsmanager_secret_version.credentials.secret_string)["client"])
+  client_key             = base64decode(jsondecode(data.aws_secretsmanager_secret_version.credentials.secret_string)["key"])
+  #cluster_ca_certificate = base64decode(jsondecode(data.aws_secretsmanager_secret_version.credentials.secret_string)["ca"])
+
 }
