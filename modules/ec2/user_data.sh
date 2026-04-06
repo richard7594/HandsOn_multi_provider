@@ -43,66 +43,6 @@ systemctl enable docker
 systemctl start docker
 
 
-# installation nginx in k3s for private_ip:80 traeffic ingress
-cd /
-mkdir nginx
-cd nginx
-touch nginx.yaml
-
-tee nginx.yaml > /dev/null <<'EOF'
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: my-nginx
-  template:
-    metadata:
-      labels:
-        app: my-nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-spec:
-  selector:
-    app: my-nginx
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress
-  annotations:
-    kubernetes.io/ingress.class: traefik
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: nginx-service
-            port:
-              number: 80
-EOF
-
-k3s kubectl apply -f nginx.yaml
-
 
 
 #Installation aws CLI, Need for pull master secret password 
@@ -114,19 +54,13 @@ unzip awscliv2.zip
 ./aws/install
 ln -s /usr/local/bin/aws /usr/bin/
 
-aws s3 cp /var/log/user-data.log s3://logshandsonrichanel/  #backup logs into s3
-
-#CLI cmd  aws secretsmanager get-secret-value --secret-id 'rds!db-314b9b7f-265d-4197-bbda-e374ba441163' 
+####for database###
+#CLI cmd  aws secretsmanager get-secret-value --secret-id 'rds!db-314b9b7f-265d-4197-bbda-e374ba441163'  
 
 # Connect to db with CLI mysql -h terraform-20260330121002152100000001.cn2g8ss4kgjq.eu-west-1.rds.amazonaws.com -P 3306 -u wordpress -p
 
-#/usr/local/bin/aws
 
-
-
-
-
-# get cluster credentials 
+# get and push cluster credentials 
 
 touch parser_credential.py
 
@@ -168,7 +102,7 @@ EOF
  python3 parser_credential.py
 
 
-
+aws s3 cp /var/log/user-data.log s3://logshandsonrichanel/  #backup logs into s3
 
 # ==> work, take time, learn kubernetes 
 
@@ -179,6 +113,76 @@ EOF
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+# installation nginx in k3s for private_ip:80 traeffic ingress
+# cd /
+# mkdir nginx
+# cd nginx
+# touch nginx.yaml
+
+# tee nginx.yaml > /dev/null <<'EOF'
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: nginx-deployment
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: my-nginx
+#   template:
+#     metadata:
+#       labels:
+#         app: my-nginx
+#     spec:
+#       containers:
+#       - name: nginx
+#         image: nginx:alpine
+#         ports:
+#         - containerPort: 80
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: nginx-service
+# spec:
+#   selector:
+#     app: my-nginx
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 80
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: nginx-ingress
+#   annotations:
+#     kubernetes.io/ingress.class: traefik
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: nginx-service
+#             port:
+#               number: 80
+# EOF
+
+# k3s kubectl apply -f nginx.yaml
 
 
 

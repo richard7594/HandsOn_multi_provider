@@ -40,3 +40,4 @@ module "kurbenetes" {
   source     = "./modules/kubernetes"
   depends_on = [module.ec2, module.vpc, module.rds]
 } # we don't give value of module'variable from root module, this module is independent
+

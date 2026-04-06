@@ -38,3 +38,7 @@ output "instance_sg_id" {
 output "rds_sg_id" {
   value = aws_security_group.rds_sg.id
 }
+
+output "nlb_dns_name" {
+  value = aws_lb.nlb.dns_name
+}
