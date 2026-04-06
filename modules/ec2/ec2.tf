@@ -44,10 +44,15 @@
 resource "aws_launch_template" "template" {
   name = "template"
 
-  # to be complete
-  # block_device_mappings {
-
-  # }
+  
+  block_device_mappings {
+    device_name = "/dev/sda1" #/dev/sda1 ==> root storage here and /dev/xdav ==> root storage on Amazon linux 
+    ebs {
+       delete_on_termination = true
+       volume_type = "gp3"
+       volume_size = 20
+    }
+  }
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2.name

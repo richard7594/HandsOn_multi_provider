@@ -55,6 +55,7 @@ resource "aws_lb_target_group" "tg" {
   health_check {
     path                = "/"
     unhealthy_threshold = 6
+    matcher = "200,302"
   }
 
 }

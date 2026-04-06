@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "s3" { # permission policy
 data "aws_iam_policy_document" "secret" {
   statement {
     effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue","secretsmanager:PutSecretValue"]
+    actions   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue"]
     resources = ["*"]
   }
 }

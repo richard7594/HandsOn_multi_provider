@@ -36,8 +36,11 @@ module "rds" {
 }
 
 
-module "kurbenetes" {
-  source     = "./modules/kubernetes"
-  depends_on = [module.ec2, module.vpc, module.rds]
+module "kubernetes" {
+  source       = "./modules/kubernetes"
+  rds_dns_name = module.rds.rds_dns_name
+  secret_id    = module.rds.secret_id
+  db_name      = module.rds.db_name
+  depends_on   = [module.ec2, module.vpc, module.rds]
 } # we don't give value of module'variable from root module, this module is independent
 
